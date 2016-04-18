@@ -21,6 +21,8 @@ public class Member {
 	private List<Bin> bins;
 	@OneToMany(fetch=FetchType.LAZY, mappedBy="member")
 	private List<User> users;
+	@OneToMany(fetch=FetchType.LAZY, mappedBy="member")
+	private List<SettleEntry> settleEntities;
 	public String getMemId() {
 		return memId;
 	}
@@ -44,5 +46,11 @@ public class Member {
 	}
 	public void setUsers(List<User> users) {
 		this.users = users;
+	}
+	public List<SettleEntry> getSettleEntities() {
+		return settleEntities;
+	}
+	public void setSettleEntities(List<SettleEntry> settleEntities) {
+		this.settleEntities = settleEntities;
 	}
 }

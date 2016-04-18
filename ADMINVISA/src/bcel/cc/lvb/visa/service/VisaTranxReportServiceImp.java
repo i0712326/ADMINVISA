@@ -20,9 +20,9 @@ public class VisaTranxReportServiceImp implements VisaTranxReportService {
 	private Logger logger = Logger.getLogger(VisaTranxReportServiceImp.class);
 	private int count =1;
 	@Override
-	public void writeHeader(Date date, String issId, String acqId, File file) throws IOException{
+	public void writeHeader(Date date, String memId, File file) throws IOException{
 		FileOutputStream fos = new FileOutputStream(file);
-		byte[] data = getHeader(date, issId, acqId);
+		byte[] data = getHeader(date, memId);
 		fos.write(data);
 		fos.close();
 	}
@@ -53,6 +53,7 @@ public class VisaTranxReportServiceImp implements VisaTranxReportService {
 	@Override
 	public void writeTailer(long num, long amt, File file) throws IOException{
 		FileOutputStream fos = new FileOutputStream(file, true);
+		
 		byte[] data = getTrailer(num,amt);
 		fos.write(data);
 		fos.close();
@@ -65,14 +66,13 @@ public class VisaTranxReportServiceImp implements VisaTranxReportService {
 	 * @return header data in byte array
 	 */
 	// write online data to file
-	private byte[] getHeader(Date date, String issId, String acqId){
+	private byte[] getHeader(Date date, String memId){
 		ISOMsg isoMsg = new ISOMsg();
 		String mti = "0510";
 		try{
 			isoMsg.setMTI(mti);
 			isoMsg.set( 15, UtilPackage.date2Str(date, "yyMMDD"));
-			isoMsg.set( 99, issId);
-			isoMsg.set(100, acqId);
+			isoMsg.set(100, memId);
 			isoMsg.setPackager(ISOMsgPackager.getPackager());
 			return isoMsg.pack();
 		}

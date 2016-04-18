@@ -59,6 +59,7 @@
 				<value>bcel.cc.lvb.visa.entity.VisaTranx</value>
 				<value>bcel.cc.lvb.visa.entity.User</value>
 				<value>bcel.cc.lvb.visa.entity.Member</value>
+				<value>bcel.cc.lvb.visa.entity.SettleEntry</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
