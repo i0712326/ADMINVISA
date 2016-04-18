@@ -19,6 +19,8 @@ public class SettleEntry {
 	private long id;
 	@Column(name="SETLDATE")
 	private Date date;
+	@Column(name="SETLNUM")
+	private long num;
 	@Column(name="SETLNET")
 	private long net;
 	
@@ -100,6 +102,18 @@ public class SettleEntry {
 	}
 	public void setId(long id) {
 		this.id = id;
+	}
+	public long getNum() {
+		return num;
+	}
+	public void setNum(long num) {
+		this.num = num;
+	}
+	public long getNet() {
+		return net;
+	}
+	public void setNet(long net) {
+		this.net = net;
 	}
 	public Date getDate() {
 		return date;

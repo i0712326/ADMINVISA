@@ -10,12 +10,14 @@ import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 
 import bcel.cc.lvb.visa.dao.IssueTxnDao;
+import bcel.cc.lvb.visa.dao.SettleEntryDao;
 import bcel.cc.lvb.visa.dao.VisaTranxDao;
 import bcel.cc.lvb.visa.entity.IssueTxn;
 import bcel.cc.lvb.visa.entity.VisaTranx;
 
 public class ReportExportServiceImp implements ReportExportService {
 	private Logger logger = Logger.getLogger(getClass());
+	private SettleEntryDao settleEntryDao;
 	private VisaTranxDao visaDao;
 	private IssueTxnDao issueTxnDao;
 	private VisaTranxReportService service;
@@ -29,6 +31,12 @@ public class ReportExportServiceImp implements ReportExportService {
 	public void setService(VisaTranxReportService service) {
 		this.service = service;
 	}
+	
+	public void setSettleEntryDao(SettleEntryDao settleEntryDao) {
+		this.settleEntryDao = settleEntryDao;
+	}
+	private long num;
+	private long amt;
 	private List<VisaTranx> acqTxn;
 	private List<VisaTranx> issTxn;
 	private List<VisaTranx> errTxn;
@@ -65,7 +73,10 @@ public class ReportExportServiceImp implements ReportExportService {
 			service.writeDispute(outAcqTxn, file);
 			service.writeDispute(outIssTxn, file);
 			
-			service.writeTailer(0,0,file);
+			num = settleEntryDao.getSettleEntry(date, memId).getNum();
+			amt = settleEntryDao.getSettleEntry(date, memId).getNet();
+			
+			service.writeTailer(num,amt,file);
 			
 		} catch (HibernateException | SQLException | IOException e) {
 			logger.debug("Exception occured while try to export data to file", e);
