@@ -120,7 +120,7 @@ public class VisaTranxReportServiceImp implements VisaTranxReportService {
 		return null;
 	}
 	/**
-	 * MTI 0200 field (2,3,4,7,11,12,
+	 * MTI 0200 field (2,3,4,7,11,12,25,32,33,37,38,41,46,81,101,104)
 	 * @param is
 	 * @return
 	 */
