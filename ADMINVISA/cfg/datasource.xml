@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+	<context:property-placeholder location="datasource.properties"/>
+	
+	<!-- online transaction fetch -->
+	
+	<bean id="bcelPoolDataSource" destroy-method="close"
+		class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${conn.driver}" />
+		<property name="url" value="${conn.url}" />
+		<property name="username" value="${conn.username}" />
+		<property name="password" value="${conn.password}" />
+		<property name="initialSize" value="${conn.initSize}"/>
+		<property name="maxActive" value="${conn.maxActive}"/>
+		<property name="maxIdle" value="${conn.maxIdle}"/>
+		<property name="maxWait" value="${conn.maxWait}"/>
+	</bean>
+	
+	<bean id="bcelPoolSessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="bcelPoolDataSource"/>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<!-- application database -->
+	<bean id="lvbVisaDataSource" destroy-method="close"
+		class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="initialSize" value="${jdbc.initSize}"/>
+		<property name="maxActive" value="${jdbc.maxActive}"/>
+		<property name="maxIdle" value="${jdbc.maxIdle}"/>
+		<property name="maxWait" value="${jdbc.maxWait}"/>
+	</bean>
+	
+	<bean id="lvbVisaSessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="lvbVisaDataSource"/>
+		<property name="packagesToScan" value="bcel.cc.lvb.entity.*"/>
+		<property name="annotatedClasses">
+			<list>
+				<value>bcel.cc.lvb.visa.entity.Bin</value>
+				<value>bcel.cc.lvb.visa.entity.IssueTxn</value>
+				<value>bcel.cc.lvb.visa.entity.ProcCode</value>
+				<value>bcel.cc.lvb.visa.entity.ReasonCode</value>
+				<value>bcel.cc.lvb.visa.entity.VisaTranx</value>
+				<value>bcel.cc.lvb.visa.entity.User</value>
+				<value>bcel.cc.lvb.visa.entity.Member</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<!-- Transaction Management -->
+	<tx:annotation-driven/>
+	<bean id="bcelPoolTranxManage" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="bcelPoolDataSource"/>
+		<qualifier value="bcelPool"/>
+	</bean>
+	<bean id="lvbVisaTranxManage" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="lvbVisaDataSource"/>
+		<qualifier value="lvbVisa"/>
+	</bean>
+</beans>

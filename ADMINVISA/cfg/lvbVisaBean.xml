@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<import resource="datasource.xml"/>
+	<import resource="bcelPoolBean.xml"/>
+	<bean id="binDao" class="bcel.cc.lvb.visa.dao.BinDaoImp">
+		<property name="sessionFactory" ref="lvbVisaSessionFactory"/>
+	</bean>
+	<bean id="issueTxnDao" class="bcel.cc.lvb.visa.dao.IssueTxnDaoImp">
+		<property name="sessionFactory" ref="lvbVisaSessionFactory"/>
+	</bean>
+	<bean id="procCodeDao" class="bcel.cc.lvb.visa.dao.ProcCodeDaoImp">
+		<property name="sessionFactory" ref="lvbVisaSessionFactory"/>
+	</bean>
+	<bean id="reasonCodeDao" class="bcel.cc.lvb.visa.dao.ReasonCodeDaoImp">
+		<property name="sessionFactory" ref="lvbVisaSessionFactory"/>
+	</bean>
+	<bean id="visaTranxDao2" class="bcel.cc.lvb.visa.dao.VisaTranxDaoImp">
+		<property name="sessionFactory" ref="lvbVisaSessionFactory"/>
+	</bean>
+	<bean id="visaRetention" class="bcel.cc.lvb.visa.service.VisaRetentionImp" abstract="true"/>
+	
+	<bean id="visaRetentionSub" class="bcel.cc.lvb.visa.service.VisaRetentionImpSub" parent="visaRetention">
+		<property name="visaTranxDao1" ref="visaTranxDao"/>
+		<property name="visaTranxDao2" ref="visaTranxDao2"/>
+		<property name="issueTxnDao" ref="issueTxnDao"/>
+		<property name="procCodeDao" ref="procCodeDao"/>
+		<property name="visaReportService" ref="service"/>
+	</bean>
+	
+</beans>
