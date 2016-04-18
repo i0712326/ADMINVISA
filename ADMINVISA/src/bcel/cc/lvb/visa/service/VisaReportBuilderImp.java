@@ -16,7 +16,7 @@ import bcel.cc.lvb.visa.entity.IssueTxn;
 import bcel.cc.lvb.visa.entity.VisaTranx;
 import bcel.cc.lvb.visa.util.UtilPackage;
 
-public abstract class VisaReportBuilderImp implements VisaReportBuilder {
+public class VisaReportBuilderImp implements VisaReportBuilder {
 	private Logger logger = Logger.getLogger(getClass());
 	private VisaTranxDao visaTranxDao;
 	private IssueTxnDao issueTxnDao;

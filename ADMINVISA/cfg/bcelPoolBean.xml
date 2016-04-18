@@ -6,9 +6,4 @@
 	<bean id="visaTranxDao" class="bcel.cc.lvb.visa.dao.VisaTranxDaoImp">
 		<property name="sessionFactory" ref="bcelPoolSessionFactory"/>
 	</bean>
-	<bean id="reportService" class="bcel.cc.lvb.visa.service.ReportExportServiceImp">
-		<property name="service" ref="service"/>
-		<property name="visaDao" ref="visaTranxDao"/>
-	</bean>
-	<bean id="service" class="bcel.cc.lvb.visa.service.VisaTranxReportServiceImp"/>
 </beans>

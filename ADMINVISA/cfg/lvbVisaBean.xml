@@ -19,14 +19,30 @@
 	<bean id="visaTranxDao2" class="bcel.cc.lvb.visa.dao.VisaTranxDaoImp">
 		<property name="sessionFactory" ref="lvbVisaSessionFactory"/>
 	</bean>
+	<bean id="settleEntryDao" class="bcel.cc.lvb.visa.dao.SettleEntryDaoImp">
+		<property name="sessionFactory" ref="lvbVisaSessionFactory"/>
+	</bean>
 	<bean id="visaRetention" class="bcel.cc.lvb.visa.service.VisaRetentionImp" abstract="true"/>
 	
+	<bean id="reportService" class="bcel.cc.lvb.visa.service.ReportExportServiceImp">
+		<property name="service" ref="service"/>
+		<property name="visaDao" ref="visaTranxDao"/>
+		<property name="issueTxnDao" ref="issueTxnDao"/>
+		<property name="settleEntryDao" ref="settleEntryDao"/>
+	</bean>
+	
+	<bean id="service" class="bcel.cc.lvb.visa.service.VisaTranxReportServiceImp"/>
 	<bean id="visaRetentionSub" class="bcel.cc.lvb.visa.service.VisaRetentionImpSub" parent="visaRetention">
 		<property name="visaTranxDao1" ref="visaTranxDao"/>
 		<property name="visaTranxDao2" ref="visaTranxDao2"/>
 		<property name="issueTxnDao" ref="issueTxnDao"/>
 		<property name="procCodeDao" ref="procCodeDao"/>
 		<property name="visaReportService" ref="service"/>
+	</bean>
+	
+	<bean id="visaReportBuilder" class="bcel.cc.lvb.visa.service.VisaReportBuilderImp">
+		<property name="issueTxnDao" ref="issueTxnDao"/>
+		<property name="visaTranxDao" ref="visaTranxDao2"/>
 	</bean>
 	
 </beans>
