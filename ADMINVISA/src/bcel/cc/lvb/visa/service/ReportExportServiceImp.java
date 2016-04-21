@@ -74,7 +74,7 @@ public class ReportExportServiceImp implements ReportExportService {
 			service.writeDispute(outIssTxn, file);
 			
 			num = settleEntryDao.getSettleEntry(date, memId).getNum();
-			amt = settleEntryDao.getSettleEntry(date, memId).getNet();
+			amt = (long) settleEntryDao.getSettleEntry(date, memId).getNet();
 			
 			service.writeTailer(num,amt,file);
 			

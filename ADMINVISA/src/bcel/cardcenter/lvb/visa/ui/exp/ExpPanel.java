@@ -7,6 +7,8 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.sql.Date;
+import java.text.ParseException;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -19,10 +21,11 @@ import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-import bcel.cardcenter.lvb.visa.ui.DateModelFormater;
 import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
 import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
 import net.sourceforge.jdatepicker.impl.UtilDateModel;
+import bcel.cardcenter.lvb.visa.ui.DateModelFormater;
+import bcel.cc.lvb.visa.util.UtilPackage;
 
 public class ExpPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -135,6 +138,14 @@ public class ExpPanel extends JPanel {
 		
 		outGoingBBtn.addActionListener(new FileChooserAction(outGoingTextField));
 		reportBBtn.addActionListener(new FileChooserAction(reportsTextField));
+		String strDate = datePicker.getJFormattedTextField().getText().trim();
+		Date date = null;
+		try {
+			date = UtilPackage.str2Date(strDate);
+		} catch (ParseException e) {
+			
+		}
+		exportBtn.addActionListener(new DataExportAction(date, new File(outGoingTextField.getText()), new File(reportsTextField.getText()), progressBar));
 	}
 	
 	private class FileChooserAction implements ActionListener{

@@ -22,77 +22,106 @@ public class SettleEntry {
 	@Column(name="SETLNUM")
 	private long num;
 	@Column(name="SETLNET")
-	private long net;
+	private double net;
 	
 	@Column(name="SETLISSNUM")
 	private long issNum;
 	@Column(name="SETLISSAMT")
-	private long issAmt;
+	private double issAmt;
 	@Column(name="SETLISSFEE")
-	private long issFee;
+	private double issFee;
 	
 	@Column(name="SETLACQNUM")
 	private long acqNum;
 	@Column(name="SETLACQAMT")
-	private long acqAmt;
+	private double acqAmt;
 	@Column(name="SETLACQFEE")
-	private long acqFee;
+	private double acqFee;
 	
 	@Column(name="SETLERRNUM")
 	private long errNum;
 	@Column(name="SETLERRAMT")
-	private long errAmt;
+	private double errAmt;
 	@Column(name="SETLERRFEE")
-	private long errFee;
+	private double errFee;
 	
 	@Column(name="SETLREVNUM")
 	private long revNum;
 	@Column(name="SETLREVAMT")
-	private long revAmt;
+	private double revAmt;
 	@Column(name="SETLREVFEE")
-	private long revFee;
+	private double revFee;
 	
 	@Column(name="INCRRNUM")
 	private long inRrNum;
 	@Column(name="INCRRAMT")
-	private long inRrAmt;
+	private double inRrAmt;
 	@Column(name="INCRRFEE")
-	private long inRrFee;
+	private double inRrFee;
 	
 	@Column(name="OUTRRNUM")
 	private long ouRrNum;
 	@Column(name="OUTRRAMT")
-	private long ouRrAmt;
+	private double ouRrAmt;
 	@Column(name="OUTRRFEE")
-	private long ouRrFee;
+	private double ouRrFee;
+	
+	@Column(name="INCFFNUM")
+	private long inFfNum;
+	@Column(name="INCFFAMT")
+	private double inFfAmt;
+	@Column(name="INCFFFEE")
+	private double inFfFee;
+	
+	@Column(name="OUTFFNUM")
+	private long ouFfNum;
+	@Column(name="OUTFFAMT")
+	private double ouFfAmt;
+	@Column(name="OUTFFFEE")
+	private double ouFfFee;
 	
 	@Column(name="INCCBNUM")
 	private long inCbNum;
 	@Column(name="INCCBAMT")
-	private long inCbAmt;
+	private double inCbAmt;
 	@Column(name="INCCBFEE")
-	private long inCbFee;
+	private double inCbFee;
 	
 	@Column(name="OUTCBNUM")
 	private long ouCbNum;
 	@Column(name="OUTCBAMT")
-	private long ouCbAmt;
+	private double ouCbAmt;
 	@Column(name="OUTCBFEE")
-	private long ouCbFee;
+	private double ouCbFee;
 	
 	@Column(name="INCRPNUM")
 	private long inRpNum;
 	@Column(name="INCRPAMT")
-	private long inRpAmt;
+	private double inRpAmt;
 	@Column(name="INCRPFEE")
-	private long inRpFee;
+	private double inRpFee;
 	
 	@Column(name="OUTRPNUM")
 	private long ouRpNum;
 	@Column(name="OUTRPAMT")
-	private long ouRpAmt;
+	private double ouRpAmt;
 	@Column(name="OUTRPFEE")
-	private long ouRpFee;
+	private double ouRpFee;
+	
+	@Column(name="INCADJNUM")
+	private long inAjNum;
+	@Column(name="INCADJAMT")
+	private double inAjAmt;
+	@Column(name="INCADJFEE")
+	private double inAjFee;
+	
+	@Column(name="OUTADJNUM")
+	private long ouAjNum;
+	@Column(name="OUTADJAMT")
+	private double ouAjAmt;
+	@Column(name="OUTADJFEE")
+	private double ouAjFee;
+	
 	@ManyToOne
 	@JoinColumn(name="MEMTBL_MEMID",table="MEMTBL",referencedColumnName="MEMID")
 	private Member member;
@@ -103,23 +132,23 @@ public class SettleEntry {
 	public void setId(long id) {
 		this.id = id;
 	}
+	public Date getDate() {
+		return date;
+	}
+	public void setDate(Date date) {
+		this.date = date;
+	}
 	public long getNum() {
 		return num;
 	}
 	public void setNum(long num) {
 		this.num = num;
 	}
-	public long getNet() {
+	public double getNet() {
 		return net;
 	}
-	public void setNet(long net) {
+	public void setNet(double net) {
 		this.net = net;
-	}
-	public Date getDate() {
-		return date;
-	}
-	public void setDate(Date date) {
-		this.date = date;
 	}
 	public long getIssNum() {
 		return issNum;
@@ -127,16 +156,16 @@ public class SettleEntry {
 	public void setIssNum(long issNum) {
 		this.issNum = issNum;
 	}
-	public long getIssAmt() {
+	public double getIssAmt() {
 		return issAmt;
 	}
-	public void setIssAmt(long issAmt) {
+	public void setIssAmt(double issAmt) {
 		this.issAmt = issAmt;
 	}
-	public long getIssFee() {
+	public double getIssFee() {
 		return issFee;
 	}
-	public void setIssFee(long issFee) {
+	public void setIssFee(double issFee) {
 		this.issFee = issFee;
 	}
 	public long getAcqNum() {
@@ -145,16 +174,16 @@ public class SettleEntry {
 	public void setAcqNum(long acqNum) {
 		this.acqNum = acqNum;
 	}
-	public long getAcqAmt() {
+	public double getAcqAmt() {
 		return acqAmt;
 	}
-	public void setAcqAmt(long acqAmt) {
+	public void setAcqAmt(double acqAmt) {
 		this.acqAmt = acqAmt;
 	}
-	public long getAcqFee() {
+	public double getAcqFee() {
 		return acqFee;
 	}
-	public void setAcqFee(long acqFee) {
+	public void setAcqFee(double acqFee) {
 		this.acqFee = acqFee;
 	}
 	public long getErrNum() {
@@ -163,16 +192,16 @@ public class SettleEntry {
 	public void setErrNum(long errNum) {
 		this.errNum = errNum;
 	}
-	public long getErrAmt() {
+	public double getErrAmt() {
 		return errAmt;
 	}
-	public void setErrAmt(long errAmt) {
+	public void setErrAmt(double errAmt) {
 		this.errAmt = errAmt;
 	}
-	public long getErrFee() {
+	public double getErrFee() {
 		return errFee;
 	}
-	public void setErrFee(long errFee) {
+	public void setErrFee(double errFee) {
 		this.errFee = errFee;
 	}
 	public long getRevNum() {
@@ -181,16 +210,16 @@ public class SettleEntry {
 	public void setRevNum(long revNum) {
 		this.revNum = revNum;
 	}
-	public long getRevAmt() {
+	public double getRevAmt() {
 		return revAmt;
 	}
-	public void setRevAmt(long revAmt) {
+	public void setRevAmt(double revAmt) {
 		this.revAmt = revAmt;
 	}
-	public long getRevFee() {
+	public double getRevFee() {
 		return revFee;
 	}
-	public void setRevFee(long revFee) {
+	public void setRevFee(double revFee) {
 		this.revFee = revFee;
 	}
 	public long getInRrNum() {
@@ -199,16 +228,16 @@ public class SettleEntry {
 	public void setInRrNum(long inRrNum) {
 		this.inRrNum = inRrNum;
 	}
-	public long getInRrAmt() {
+	public double getInRrAmt() {
 		return inRrAmt;
 	}
-	public void setInRrAmt(long inRrAmt) {
+	public void setInRrAmt(double inRrAmt) {
 		this.inRrAmt = inRrAmt;
 	}
-	public long getInRrFee() {
+	public double getInRrFee() {
 		return inRrFee;
 	}
-	public void setInRrFee(long inRrFee) {
+	public void setInRrFee(double inRrFee) {
 		this.inRrFee = inRrFee;
 	}
 	public long getOuRrNum() {
@@ -217,17 +246,54 @@ public class SettleEntry {
 	public void setOuRrNum(long ouRrNum) {
 		this.ouRrNum = ouRrNum;
 	}
-	public long getOuRrAmt() {
+	public double getOuRrAmt() {
 		return ouRrAmt;
 	}
-	public void setOuRrAmt(long ouRrAmt) {
+	public void setOuRrAmt(double ouRrAmt) {
 		this.ouRrAmt = ouRrAmt;
 	}
-	public long getOuRrFee() {
+	public double getOuRrFee() {
 		return ouRrFee;
 	}
-	public void setOuRrFee(long ouRrFee) {
+	public void setOuRrFee(double ouRrFee) {
 		this.ouRrFee = ouRrFee;
+	}
+	
+	public long getInFfNum() {
+		return inFfNum;
+	}
+	public void setInFfNum(long inFfNum) {
+		this.inFfNum = inFfNum;
+	}
+	public double getInFfAmt() {
+		return inFfAmt;
+	}
+	public void setInFfAmt(double inFfAmt) {
+		this.inFfAmt = inFfAmt;
+	}
+	public double getInFfFee() {
+		return inFfFee;
+	}
+	public void setInFfFee(double inFfFee) {
+		this.inFfFee = inFfFee;
+	}
+	public long getOuFfNum() {
+		return ouFfNum;
+	}
+	public void setOuFfNum(long ouFfNum) {
+		this.ouFfNum = ouFfNum;
+	}
+	public double getOuFfAmt() {
+		return ouFfAmt;
+	}
+	public void setOuFfAmt(double ouFfAmt) {
+		this.ouFfAmt = ouFfAmt;
+	}
+	public double getOuFfFee() {
+		return ouFfFee;
+	}
+	public void setOuFfFee(double ouFfFee) {
+		this.ouFfFee = ouFfFee;
 	}
 	public long getInCbNum() {
 		return inCbNum;
@@ -235,16 +301,16 @@ public class SettleEntry {
 	public void setInCbNum(long inCbNum) {
 		this.inCbNum = inCbNum;
 	}
-	public long getInCbAmt() {
+	public double getInCbAmt() {
 		return inCbAmt;
 	}
-	public void setInCbAmt(long inCbAmt) {
+	public void setInCbAmt(double inCbAmt) {
 		this.inCbAmt = inCbAmt;
 	}
-	public long getInCbFee() {
+	public double getInCbFee() {
 		return inCbFee;
 	}
-	public void setInCbFee(long inCbFee) {
+	public void setInCbFee(double inCbFee) {
 		this.inCbFee = inCbFee;
 	}
 	public long getOuCbNum() {
@@ -253,16 +319,16 @@ public class SettleEntry {
 	public void setOuCbNum(long ouCbNum) {
 		this.ouCbNum = ouCbNum;
 	}
-	public long getOuCbAmt() {
+	public double getOuCbAmt() {
 		return ouCbAmt;
 	}
-	public void setOuCbAmt(long ouCbAmt) {
+	public void setOuCbAmt(double ouCbAmt) {
 		this.ouCbAmt = ouCbAmt;
 	}
-	public long getOuCbFee() {
+	public double getOuCbFee() {
 		return ouCbFee;
 	}
-	public void setOuCbFee(long ouCbFee) {
+	public void setOuCbFee(double ouCbFee) {
 		this.ouCbFee = ouCbFee;
 	}
 	public long getInRpNum() {
@@ -271,16 +337,16 @@ public class SettleEntry {
 	public void setInRpNum(long inRpNum) {
 		this.inRpNum = inRpNum;
 	}
-	public long getInRpAmt() {
+	public double getInRpAmt() {
 		return inRpAmt;
 	}
-	public void setInRpAmt(long inRpAmt) {
+	public void setInRpAmt(double inRpAmt) {
 		this.inRpAmt = inRpAmt;
 	}
-	public long getInRpFee() {
+	public double getInRpFee() {
 		return inRpFee;
 	}
-	public void setInRpFee(long inRpFee) {
+	public void setInRpFee(double inRpFee) {
 		this.inRpFee = inRpFee;
 	}
 	public long getOuRpNum() {
@@ -289,17 +355,53 @@ public class SettleEntry {
 	public void setOuRpNum(long ouRpNum) {
 		this.ouRpNum = ouRpNum;
 	}
-	public long getOuRpAmt() {
+	public double getOuRpAmt() {
 		return ouRpAmt;
 	}
-	public void setOuRpAmt(long ouRpAmt) {
+	public void setOuRpAmt(double ouRpAmt) {
 		this.ouRpAmt = ouRpAmt;
 	}
-	public long getOuRpFee() {
+	public double getOuRpFee() {
 		return ouRpFee;
 	}
-	public void setOuRpFee(long ouRpFee) {
+	public void setOuRpFee(double ouRpFee) {
 		this.ouRpFee = ouRpFee;
+	}
+	public long getInAjNum() {
+		return inAjNum;
+	}
+	public void setInAjNum(long inAjNum) {
+		this.inAjNum = inAjNum;
+	}
+	public double getInAjAmt() {
+		return inAjAmt;
+	}
+	public void setInAjAmt(double inAjAmt) {
+		this.inAjAmt = inAjAmt;
+	}
+	public double getInAjFee() {
+		return inAjFee;
+	}
+	public void setInAjFee(double inAjFee) {
+		this.inAjFee = inAjFee;
+	}
+	public long getOuAjNum() {
+		return ouAjNum;
+	}
+	public void setOuAjNum(long ouAjNum) {
+		this.ouAjNum = ouAjNum;
+	}
+	public double getOuAjAmt() {
+		return ouAjAmt;
+	}
+	public void setOuAjAmt(double ouAjAmt) {
+		this.ouAjAmt = ouAjAmt;
+	}
+	public double getOuAjFee() {
+		return ouAjFee;
+	}
+	public void setOuAjFee(double ouAjFee) {
+		this.ouAjFee = ouAjFee;
 	}
 	public Member getMember() {
 		return member;

@@ -11,15 +11,22 @@ import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 
 import bcel.cc.lvb.visa.dao.IssueTxnDao;
+import bcel.cc.lvb.visa.dao.MemberDao;
+import bcel.cc.lvb.visa.dao.SettleEntryDao;
 import bcel.cc.lvb.visa.dao.VisaTranxDao;
 import bcel.cc.lvb.visa.entity.IssueTxn;
+import bcel.cc.lvb.visa.entity.Member;
+import bcel.cc.lvb.visa.entity.SettleEntry;
 import bcel.cc.lvb.visa.entity.VisaTranx;
 import bcel.cc.lvb.visa.util.UtilPackage;
 
 public class VisaReportBuilderImp implements VisaReportBuilder {
 	private Logger logger = Logger.getLogger(getClass());
+	private MemberDao memberDao;
 	private VisaTranxDao visaTranxDao;
 	private IssueTxnDao issueTxnDao;
+	private SettleEntryDao settleEntryDao;
+	
 	// online transaction
 	private ReportEntry issTxnEntry;
 	private ReportEntry acqTxnEntry;
@@ -37,69 +44,186 @@ public class VisaReportBuilderImp implements VisaReportBuilder {
 	private ReportEntry iIssRpEntry;
 	private ReportEntry iIssAjEntry;
 	
+	// settle data
+	private SettleEntry settleEntry;
+	private double net;
+	private long num;
+	
 	public void setVisaTranxDao(VisaTranxDao visaTranxDao){
 		this.visaTranxDao = visaTranxDao;
 	}
 	public void setIssueTxnDao(IssueTxnDao issueTxnDao){
 		this.issueTxnDao = issueTxnDao;
 	}
-	
+	public void setSettleEntryDao(SettleEntryDao settleEntryDao) {
+		this.settleEntryDao = settleEntryDao;
+	}
+	public void setMemberDao(MemberDao memberDao) {
+		this.memberDao = memberDao;
+	}
 	@Override
 	public void generate(Date date, String memId, File file) {
 		// get online for issuing and acquiring
-
+		/* persist settlement data to database */
+		settleEntry = new SettleEntry();
 		try {
+			// get member
+			Member member = memberDao.getMember(memId);
 			// issuing transaction
 			List<VisaTranx> issTxns = visaTranxDao.getIssVisaTranx(date, memId);
-			issTxnEntry = new ReportEntry(issTxns.size(), calAmt(issTxns), calFee(issTxns));
+			long issNum = issTxns.size();
+			double issAmt = calAmt(issTxns);
+			double issFee = calFee(issTxns);
+			issTxnEntry = new ReportEntry((int)issNum, issAmt, issFee);
+			settleEntry.setIssNum(issNum);
+			settleEntry.setIssAmt(issAmt);
+			settleEntry.setIssFee(issFee);
+			num +=issNum;
+			/* acquiring transaction */
 			
-			// acquiring transaction
 			List<VisaTranx> acqTxns = visaTranxDao.getAcqVisaTranx(date, memId);
-			acqTxnEntry = new ReportEntry(acqTxns.size(), calAmt(acqTxns), calFee(acqTxns));
-			
-			// error transaction
+			long acqNum = acqTxns.size();
+			double acqAmt = calAmt(acqTxns);
+			double acqFee = calFee(acqTxns);
+			acqTxnEntry = new ReportEntry((int)acqNum, acqAmt, acqFee);
+			settleEntry.setAcqNum(acqNum);
+			settleEntry.setAcqAmt(acqAmt);
+			settleEntry.setAcqFee(acqFee);
+			num+=acqNum;
+			/* error transaction */
 			List<VisaTranx> errTxns = visaTranxDao.getErrVisaTranx(date, memId);
-			errTxnEntry = new ReportEntry(errTxns.size(), calAmt(errTxns), calFee(errTxns));
-			
-			// reversal transaction
+			long errNum = errTxns.size();
+			double errAmt = calAmt(errTxns);
+			double errFee = calFee(errTxns);
+			errTxnEntry = new ReportEntry((int)errNum, errAmt, errFee);
+			settleEntry.setErrNum(errNum);
+			settleEntry.setErrAmt(errAmt);
+			settleEntry.setErrFee(errFee);
+			num+=errNum;
+			/* reversal transaction */
 			List<VisaTranx> revTxns = visaTranxDao.getRevVisaTranx(date, memId);
-			revTxnEntry = new ReportEntry(revTxns.size(), calAmt(revTxns), calFee(revTxns));
+			long revNum = revTxns.size();
+			double revAmt = calAmt(revTxns);
+			double revFee = calFee(revTxns);
+			revTxnEntry = new ReportEntry((int) revNum, revAmt , revFee);
+			settleEntry.setRevNum(revNum);
+			settleEntry.setRevAmt(revAmt);
+			settleEntry.setRevFee(revFee);
+			num+=revNum;
+			/* get outgoing */
 			
-			// get outgoing
+			// retrieval request
 			List<IssueTxn> oIssRr = issueTxnDao.getIssueTxnIssByProc(date, memId, "500001");
-			oIssRrEntry = new ReportEntry(oIssRr.size(), calIssueAmt(oIssRr),calIssueFee(oIssRr));
-			
+			long oIssRrNum = oIssRr.size();
+			double oIssRrAmt = calIssueAmt(oIssRr);
+			double oIssRrFee = calIssueFee(oIssRr);
+			oIssRrEntry = new ReportEntry((int) oIssRrNum, oIssRrAmt, oIssRrFee);
+			settleEntry.setOuRrNum(oIssRrNum);
+			settleEntry.setOuRrAmt(oIssRrAmt);
+			settleEntry.setOuRrFee(oIssRrFee);
+			num+=oIssRrNum;
+			// fulfillment
 			List<IssueTxn> oAcqFf = issueTxnDao.getIssueTxnAcqByProc(date, memId, "500002");
-			oAcqFfEntry = new ReportEntry(oAcqFf.size(), calIssueAmt(oAcqFf), calIssueFee(oAcqFf));
-			
+			long oAcqFfNum = oAcqFf.size();
+			double oAcqFfAmt = calIssueAmt(oAcqFf);
+			double oAcqFfFee = calIssueFee(oAcqFf);
+			oAcqFfEntry = new ReportEntry((int)oAcqFfNum, oAcqFfAmt, oAcqFfFee);
+			settleEntry.setOuFfNum(oAcqFfNum);
+			settleEntry.setOuFfAmt(oAcqFfAmt);
+			settleEntry.setOuFfFee(oAcqFfFee);
+			num+=oAcqFfNum;
+			// charge back
 			List<IssueTxn> oIssCb = issueTxnDao.getIssueTxnIssByProc(date, memId, "600001");
-			oIssCbEntry = new ReportEntry(oIssCb.size(), calIssueAmt(oIssCb), calIssueFee(oIssCb));
-			
+			long oIssCbNum = oIssCb.size();
+			double oIssCbAmt = calIssueAmt(oIssCb);
+			double oIssCbFee = calIssueFee(oIssCb);
+			oIssCbEntry = new ReportEntry((int)oIssCbNum, oIssCbAmt, oIssCbFee);
+			settleEntry.setOuCbNum(oIssCbNum);
+			settleEntry.setOuCbFee(oIssCbFee);
+			num+=oIssCbNum;
+			// re-present
 			List<IssueTxn> oAcqRp = issueTxnDao.getIssueTxnAcqByProc(date, memId, "800001");
-			oAcqRpEntry = new ReportEntry(oAcqRp.size(), calIssueAmt(oAcqRp), calIssueFee(oAcqRp));
-			
+			long oAcqRpNum = oAcqRp.size();
+			double oAcqRpAmt = calIssueAmt(oAcqRp);
+			double oAcqRpFee = calIssueFee(oAcqRp);
+			oAcqRpEntry = new ReportEntry((int)oAcqRpNum, oAcqRpAmt, oAcqRpFee);
+			settleEntry.setOuRpNum(oAcqRpNum);
+			settleEntry.setOuRpAmt(oAcqRpAmt);
+			settleEntry.setOuRpFee(oAcqRpFee);
+			num+=oAcqRpNum;
+			// adjustment
 			List<IssueTxn> oAcqAj = issueTxnDao.getIssueTxnAcqByProc(date, memId, "700001");
-			oAcqAjEntry = new ReportEntry(oAcqAj.size(), calIssueAmt(oAcqAj), calIssueFee(oAcqAj));
-			// get incoming
+			long oAcqAjNum = oAcqAj.size();
+			double oAcqAjAmt = calIssueAmt(oAcqAj);
+			double oAcqAjFee = calIssueFee(oAcqAj);
+			oAcqAjEntry = new ReportEntry( (int) oAcqAjNum, oAcqAjAmt, oAcqAjFee);
+			settleEntry.setOuAjNum(oAcqAjNum);
+			settleEntry.setOuAjAmt(oAcqAjAmt);
+			settleEntry.setOuAjFee(oAcqAjFee);
+			num+=oAcqAjNum;
+			/* get incoming */
+			// retrieval request
 			List<IssueTxn> iAcqRr = issueTxnDao.getIssueTxnAcqByProc(date, memId, "500001");
-			iAcqRrEntry = new ReportEntry(iAcqRr.size(), calIssueAmt(iAcqRr), calIssueFee(iAcqRr));
-			
+			long iAcqRrNum = iAcqRr.size();
+			double iAcqRrAmt = calIssueAmt(iAcqRr);
+			double iAcqRrFee = calIssueFee(iAcqRr);
+			iAcqRrEntry = new ReportEntry((int)iAcqRrNum, iAcqRrAmt, iAcqRrFee);
+			settleEntry.setInRrNum(iAcqRrNum);
+			settleEntry.setInRrAmt(iAcqRrAmt);
+			settleEntry.setInRrFee(iAcqRrFee);
+			num+=iAcqRrNum;
+			// fulfillment
 			List<IssueTxn> iIssFf = issueTxnDao.getIssueTxnIssByProc(date, memId, "500002");
-			iIssFfEntry = new ReportEntry(iIssFf.size(), calIssueAmt(iIssFf), calIssueFee(iIssFf));
-			
+			long iIssFfNum = iIssFf.size();
+			double iIssFfAmt = calIssueAmt(iIssFf);
+			double iIssFfFee = calIssueFee(iIssFf);
+			iIssFfEntry = new ReportEntry((int)iIssFfNum, iIssFfAmt, iIssFfFee);
+			settleEntry.setInFfNum(iIssFfNum);
+			settleEntry.setInFfAmt(iIssFfAmt);
+			settleEntry.setInFfFee(iIssFfFee);
+			num+=iIssFfNum;
+			// charge back
 			List<IssueTxn> iAcqCb = issueTxnDao.getIssueTxnAcqByProc(date, memId, "600001");
-			iAcqCbEntry = new ReportEntry(iAcqCb.size(), calIssueAmt(iAcqCb), calIssueFee(iAcqCb));
-			
+			long iAcqCbNum = iAcqCb.size();
+			double iAcqCbAmt = calIssueAmt(iAcqCb);
+			double iAcqCbFee = calIssueFee(iAcqCb);
+			iAcqCbEntry = new ReportEntry((int)iAcqCbNum, iAcqCbAmt, iAcqCbFee);
+			settleEntry.setInCbNum(iAcqCbNum);
+			settleEntry.setInCbAmt(iAcqCbAmt);
+			settleEntry.setInCbFee(iAcqCbFee);
+			num+=iAcqCbNum;
+			// re-present
 			List<IssueTxn> iIssRp = issueTxnDao.getIssueTxnIssByProc(date, memId, "800001");
-			iIssRpEntry = new ReportEntry(iIssRp.size(), calIssueAmt(iIssRp), calIssueFee(iIssRp));
-			
+			long iIssRpNum = iIssRp.size();
+			double iIssRpAmt = calIssueAmt(iIssRp);
+			double iIssRpFee = calIssueFee(iIssRp);
+			iIssRpEntry = new ReportEntry((int)iIssRpNum, iIssRpAmt, iIssRpFee);
+			settleEntry.setInRpNum(iIssRpNum);
+			settleEntry.setInRpAmt(iIssRpAmt);
+			settleEntry.setInRpFee(iIssRpFee);
+			num+=iIssRpNum;
+			// adjustment
 			List<IssueTxn> iIssAj = issueTxnDao.getIssueTxnIssByProc(date, memId, "700001");
-			iIssAjEntry = new ReportEntry(iIssAj.size(), calIssueAmt(iIssAj), calIssueFee(iIssAj));
+			long iIssAjNum = iIssAj.size();
+			double iIssAjAmt = calIssueAmt(iIssAj);
+			double iIssAjFee = calIssueFee(iIssAj);
+			iIssAjEntry = new ReportEntry((int)iIssAjNum, iIssAjAmt, iIssAjFee);
+			settleEntry.setInAjNum(iIssAjNum);
+			settleEntry.setInAjAmt(iIssAjAmt);
+			settleEntry.setInAjFee(iIssAjFee);
+			num+=iIssAjNum;
+			
+			/* settlement detail to database */
+			net = getNet();
+			settleEntry.setNet(net);
+			settleEntry.setNum(num);
+			settleEntry.setMember(member);
+			settleEntryDao.save(settleEntry);
 			
 			/* write out report */
 			writeHeader(memId, date, file);
 			
-			// financial reports (issuing, acquiring, charge back (i/o), re presentment(i/o), adjustment(i/o) 
+			// financial reports (issuing, acquiring, charge back (i/o), re present(i/o), adjustment(i/o) 
 			writeReport("ISSUING TRANSACTION", issTxns, file);
 			writeReport("ACQUIRNG TRANSACTION", acqTxns, file);
 			// incoming
@@ -221,8 +345,7 @@ public class VisaReportBuilderImp implements VisaReportBuilder {
 			pw.printf("|  INCOMING REPRESENTMENT  |    %5s          |      %10s     |      %10s      |       %10s      |\r\n", UtilPackage.intFormat(iIssRpEntry.getNumber()), UtilPackage.numFormat(iIssRpEntry.getAmount()), UtilPackage.numFormat(iIssRpEntry.getFee()), UtilPackage.numFormat(iIssRpEntry.getTotal()));
 			pw.printf("|  INCOMING ADJUSTMENT     |    %5s          |      %10s     |      %10s      |       %10s      |\r\n", UtilPackage.intFormat(iIssAjEntry.getNumber()), UtilPackage.numFormat(iIssAjEntry.getAmount()), UtilPackage.numFormat(iIssAjEntry.getFee()), UtilPackage.numFormat(iIssAjEntry.getTotal()));
 			pw.printf("+--------------------------+-----------------+---------------+----------------+-----------------+\r\n");
-			double net = getNet();
-			pw.printf("Net Settlement : %10s\r\n", UtilPackage.numFormat(net));
+			pw.printf("Net Settlement : %19s\r\n", UtilPackage.numFormat(net));
 			pw.close();
 		} catch (FileNotFoundException e) {
 			logger.debug("Exception occured while try to export report", e);

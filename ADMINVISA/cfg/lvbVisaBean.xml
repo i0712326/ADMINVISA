@@ -39,10 +39,14 @@
 		<property name="procCodeDao" ref="procCodeDao"/>
 		<property name="visaReportService" ref="service"/>
 	</bean>
-	
+	<bean id="memberDao" class="bcel.cc.lvb.visa.dao.MemberDaoImp">
+		<property name="sessionFactory" ref="lvbVisaSessionFactory"/>
+	</bean>
 	<bean id="visaReportBuilder" class="bcel.cc.lvb.visa.service.VisaReportBuilderImp">
 		<property name="issueTxnDao" ref="issueTxnDao"/>
 		<property name="visaTranxDao" ref="visaTranxDao2"/>
+		<property name="settleEntryDao" ref="settleEntryDao"/>
+		<property name="memberDao" ref="memberDao"/>
 	</bean>
 	
 </beans>

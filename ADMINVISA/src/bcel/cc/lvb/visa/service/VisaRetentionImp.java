@@ -16,7 +16,7 @@ public abstract class VisaRetentionImp implements VisaRetention {
 	public abstract void writeOnline(File file);
 	public abstract void writeDispute(File file);
 	@Override
-	public void retend(Date date, File file) {
+	public void retend(Date date, String memId, File file) {
 		replucate(date);
 		fetchOnline(date);
 		fetchDispute(date);
