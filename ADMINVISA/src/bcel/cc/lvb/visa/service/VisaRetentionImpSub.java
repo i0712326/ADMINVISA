@@ -23,6 +23,7 @@ public class VisaRetentionImpSub extends VisaRetentionImp {
 	private IssueTxnDao issueTxnDao;
 	private ProcCodeDao procCodeDao;
 	private VisaTranxReportService visaReportService;
+	private long num, amt;
 	public void setVisaTranxDao1(VisaTranxDao visaTranxDao1) {
 		this.visaTranxDao1 = visaTranxDao1;
 	}
@@ -58,9 +59,10 @@ public class VisaRetentionImpSub extends VisaRetentionImp {
 	}
 
 	@Override
-	public void fetchOnline(Date date) {
+	public void fetchOnline(Date date, String memId) {
 		try{
-			online = visaTranxDao2.getVisaTranx(date,"220699");
+			online = visaTranxDao2.getVisaTranx(date,memId);
+			num+=online.size();
 		}
 		catch(SQLException | HibernateException e){
 			online = new ArrayList<VisaTranx>();
@@ -69,15 +71,33 @@ public class VisaRetentionImpSub extends VisaRetentionImp {
 	}
 
 	@Override
-	public void fetchDispute(Date date) {
+	public void fetchDispute(Date date, String memId) {
 		try {
-			dispute = issueTxnDao.getIssuesByDate(date);
+			acqOutgoing = issueTxnDao.getAcqOutgoing(date, memId);
+			issOutgoing = issueTxnDao.getIssOutgoing(date, memId);
+			num+=acqOutgoing.size()+issOutgoing.size();
 		} catch (HibernateException | SQLException e) {
 			dispute = new ArrayList<IssueTxn>();
 			logger.debug("Exception occured while try to fetch data from dispute table",e);
 		}
 	}
-
+	
+	@Override
+	public void writeHeader(Date date, String memId, File file) {
+		try {
+			visaReportService.writeHeader(date, memId, file);
+		} catch (IOException e) {
+			logger.debug("Exception occured while try to write header", e);
+		}
+	}
+	@Override
+	public void writeTrailer(File file) {
+		try {
+			visaReportService.writeTailer(num, amt, file);
+		} catch (IOException e) {
+			logger.debug("Exception occured while try to write trailer", e);
+		}
+	}
 	@Override
 	public void writeOnline(File file) {
 		try {
@@ -90,7 +110,8 @@ public class VisaRetentionImpSub extends VisaRetentionImp {
 	@Override
 	public void writeDispute(File file) {
 		try {
-			visaReportService.writeDispute(dispute, file);
+			visaReportService.writeDispute(acqOutgoing, file);
+			visaReportService.writeDispute(issOutgoing, file);
 		} catch (IOException e) {
 			logger.debug("Exception occured while try to write dispute data to file", e);
 		}
